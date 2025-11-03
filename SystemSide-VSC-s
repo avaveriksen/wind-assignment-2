@@ -47,3 +47,6 @@ I_WT2 = I_3 - I_42
 
 
 V_poc = V_B1 - Z_6*(I_WT1+I_WT2)
+
+
+##TEST 
