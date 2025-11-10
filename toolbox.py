@@ -2,6 +2,8 @@
 
 from scipy.optimize import fsolve
 import numpy as np
+import math, pprint
+
 
 class Tools:
     def equations(VS, *P):
