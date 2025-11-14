@@ -12,7 +12,8 @@
 - [x] Code how to solve for power on generator side
   - [ ] Rewrite into callable function, inputs are windspeed and/or omega, put function in toolbox.
 - [ ] Code how to solve for power, second method.
-- [x] Derive three equations on the grid side.
+- [ ] Derive three equations on the grid side.
+  - We have three equations, AVE is working on verifying that they are correct 14/8-25.
   - [ ] Find out a way to verify the three functions, maybe speak with Nenad?
 - [ ] Write function in toolbox.py to output all impedances in system **Tools.get_impedances()**
 - [ ] Implement solver (somewhat implemented, verify if it works)
