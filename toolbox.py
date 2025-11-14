@@ -4,15 +4,6 @@ from scipy.optimize import fsolve
 import numpy as np
 import math, pprint
 
-from Beta0 import Vw, turbine_mechanics
-
-poles = 266
-Ls = 7.8e-3
-Rs = 0.254
-psi_f = 19.5
-P_mech_rated = 10e6
-P_rot_loss_rated = 225e3
-N_rated_rpm = 12.0
 class Tools:
     def equations(self, VS, *args):
         '''
@@ -226,54 +217,48 @@ class Tools:
             "efficiency_%": chosen["eff_by_net"],
             "delta_deg": chosen["delta_deg"]
         }
-    def turbine_mechanics(Vw):
-        N_rpm = Vw
-        omega_m = 2*math.pi*N_rpm/60
-        omega_rated = 2*math.pi*N_rated_rpm/60
-        pole_pairs = poles/2
-        omega_e = pole_pairs * omega_m
 
-        Ea = omega_e * psi_f
-        Xs = omega_e * Ls
+    def get_output_current(self, V_T1, V_T2, P, verb=False):
+        '''
+        Calculates the output current after the generator voltages has been solved for.
+        :param V_T1: Voltage of turbine 1
+        :param V_T2: Voltage of turbine 2
+        :param P: Tuple of Active powers
+        :return:
+        '''
+        P1 = P[0]
+        P2 = P[1]
 
-        k_w = P_mech_rated / (omega_rated**3)
-        P_mech_total = k_w*(omega_m**3)
+        Z11, Z12, Z21, Z22, Z31, Z32, Z41, Z42, Z5, Z6 = self.get_impedances(verb=False)
 
-        P_rot_loss = P_rot_loss_rated * (omega_m/omega_rated)**2
-        P_mech_net = P_mech_total - P_rot_loss
-        P_phase = P_mech_net / 3
+        V_POC = 4e3 / np.sqrt(3)
+        # Calculate V_B, necessary for current calculations. Equation taken from equations.ipynb
+        V_B = -P1 * Z11 / np.conj(V_T1) + V_T1 - Z21 * (P1 / np.conj(V_T1) - (-P1 * Z11 / np.conj(V_T1) + V_T1) / Z31)
 
-        return dict(Ea=Ea, Xs=Xs, P_mech_net=P_mech_net, P_phase=P_phase)
+        # Currents from terminals
+        IT1 = P1/np.conj(V_T1) - V_B/Z41 - (-P1*Z11/np.conj(V_T1) + V_T1)/Z31
+        IT2 = P2/np.conj(V_T2) - V_B/Z42 - (-P2*Z12/np.conj(V_T2) + V_T2)/Z32
 
-    def generator_pf1(Vw):
-        m = turbine_mechanics(Vw)
-        Ea=m["Ea"]; Xs=m["Xs"]; P_phase=m["P_phase"]; P_mech_net=m["P_mech_net"]
+        # The output current is the sum of the turbine currents minus the current that escapes through the shunt capacitor of the 220kV cable
+        I_POC = IT1 + IT2 - V_POC / Z6
 
-        a = Xs**2
-        b = -Ea**2
-        c = P_phase**2
-        disc = b*b - 4*a*c
-        y1 = (-b + math.sqrt(disc))/(2*a)
-        y2 = (-b - math.sqrt(disc))/(2*a)
+        if verb:
+            print("I_POC:", I_POC)
 
-        candidates = []
-        for y in (y1, y2):
-            if y <= 0: continue
-            Ia = math.sqrt(y)
-            cosd = P_phase/(Ea*Ia)
-            if abs(cosd) > 1: continue
-            Va = (Ea*cosd - Ia*Rs) + 0j
-            S = 3*Va*Ia
-            candidates.append((Ia, Va, S, cosd))
+        return I_POC
 
-        Ia, Va, S, cosd = max(candidates, key=lambda x:x[3])
-        return dict(Vw=Vw, Ea=Ea, Va=Va, Ia=Ia, S=S, P_mech_net=P_mech_net)
-    def generator_beta0(Vw):
-        m = turbine_mechanics(Vw)
-        Ea=m["Ea"]; Xs=m["Xs"]; P_mech_net=m["P_mech_net"]
+    def get_output_power(self, V_T1, V_T2, P, verb=False):
+        '''
+        Calculates the single phase output power after the generator voltages has been solved for.
+        :return:
+        '''
+        V_POC = 4e3 / np.sqrt(3)
+        I_POC = self.get_output_current(V_T1, V_T2, P, verb)
 
-        Ia = P_mech_net / (3*Ea)
-        Va = Ea - Ia*(Rs + 1j*Xs)
-        S = 3*Va*Ia
+        S_POC = V_POC * I_POC
 
-        return dict(Vw=Vw, Ea=Ea, Va=Va, Ia=Ia, S=S, P_mech_net=P_mech_net)
+        if verb:
+            print("S_POC:", S_POC)
+
+        return S_POC
+
