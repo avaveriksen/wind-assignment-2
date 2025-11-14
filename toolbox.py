@@ -23,8 +23,8 @@ class Tools:
         Z11, Z12, Z21, Z22, Z31, Z32, Z41, Z42, Z5, Z6 = self.get_impedances(verb=False)
 
         # equations copied from /Anders/equations.ipynb
-        eq1 = (-P1*V_T2*Z11*Z31*Z32*(Z41*Z42 + Z41*Z5 + Z42*Z5) + V_T1**2*V_T2*Z31*Z32*(Z41*Z42 + Z41*Z5 + Z42*Z5) - V_T2*Z21*Z32*(P1*Z11 + P1*Z31 - V_T1**2)*(Z41*Z42 + Z41*Z5 + Z42*Z5) - Z41*Z42*(P1*V_T2*Z11*Z32*Z5 + P1*V_T2*Z31*Z32*Z5 + P2*V_T1*Z12*Z31*Z5 + P2*V_T1*Z31*Z32*Z5 + V_POC*V_T1*V_T2*Z31*Z32 - V_T1**2*V_T2*Z32*Z5 - V_T1*V_T2**2*Z31*Z5))/(V_T1*V_T2*Z31*Z32*(Z41*Z42 + Z41*Z5 + Z42*Z5))
-        eq2 = (-P2*V_T1*Z12*Z31*Z32*(Z41*Z42 + Z41*Z5 + Z42*Z5) + V_T1*V_T2**2*Z31*Z32*(Z41*Z42 + Z41*Z5 + Z42*Z5) - V_T1*Z22*Z31*(P2*Z12 + P2*Z32 - V_T2**2)*(Z41*Z42 + Z41*Z5 + Z42*Z5) - Z41*Z42*(P1*V_T2*Z11*Z32*Z5 + P1*V_T2*Z31*Z32*Z5 + P2*V_T1*Z12*Z31*Z5 + P2*V_T1*Z31*Z32*Z5 + V_POC*V_T1*V_T2*Z31*Z32 - V_T1**2*V_T2*Z32*Z5 - V_T1*V_T2**2*Z31*Z5))/(V_T1*V_T2*Z31*Z32*(Z41*Z42 + Z41*Z5 + Z42*Z5))
+        eq1 = (-P1*Z11*Z31*Z32*(Z41*Z42 + Z41*Z5 + Z42*Z5)*np.conj(V_T2) + V_T1*Z31*Z32*(Z41*Z42 + Z41*Z5 + Z42*Z5)*np.conj(V_T1)*np.conj(V_T2) - Z21*Z32*(P1*Z11 + P1*Z31 - V_T1*np.conj(V_T1))*(Z41*Z42 + Z41*Z5 + Z42*Z5)*np.conj(V_T2) - Z41*Z42*(P1*Z11*Z32*Z5*np.conj(V_T2) + P1*Z31*Z32*Z5*np.conj(V_T2) + P2*Z12*Z31*Z5*np.conj(V_T1) + P2*Z31*Z32*Z5*np.conj(V_T1) + V_POC*Z31*Z32*np.conj(V_T1)*np.conj(V_T2) - V_T1*Z32*Z5*np.conj(V_T1)*np.conj(V_T2) - V_T2*Z31*Z5*np.conj(V_T1)*np.conj(V_T2)))/(Z31*Z32*(Z41*Z42 + Z41*Z5 + Z42*Z5)*np.conj(V_T1)*np.conj(V_T2))
+        eq2 = (-P2*Z12*Z31*Z32*(Z41*Z42 + Z41*Z5 + Z42*Z5)*np.conj(V_T1) + V_T2*Z31*Z32*(Z41*Z42 + Z41*Z5 + Z42*Z5)*np.conj(V_T1)*np.conj(V_T2) - Z22*Z31*(P2*Z12 + P2*Z32 - V_T2*np.conj(V_T2))*(Z41*Z42 + Z41*Z5 + Z42*Z5)*np.conj(V_T1) - Z41*Z42*(P1*Z11*Z32*Z5*np.conj(V_T2) + P1*Z31*Z32*Z5*np.conj(V_T2) + P2*Z12*Z31*Z5*np.conj(V_T1) + P2*Z31*Z32*Z5*np.conj(V_T1) + V_POC*Z31*Z32*np.conj(V_T1)*np.conj(V_T2) - V_T1*Z32*Z5*np.conj(V_T1)*np.conj(V_T2) - V_T2*Z31*Z5*np.conj(V_T1)*np.conj(V_T2)))/(Z31*Z32*(Z41*Z42 + Z41*Z5 + Z42*Z5)*np.conj(V_T1)*np.conj(V_T2))
 
         return np.array([eq1.real, eq1.imag, eq2.real, eq2.imag])
 
