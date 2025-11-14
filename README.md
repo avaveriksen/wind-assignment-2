@@ -10,13 +10,14 @@
 
 ### Tasks
 - [x] Code how to solve for power on generator side
-  - [ ] Rewrite into callable function, inputs are windspeed and/or omega, put function in toolbox.
+  - [x] Rewrite into callable function, inputs are windspeed and/or omega, put function in toolbox.
 - [ ] Code how to solve for power, second method.
-- [ ] Derive three equations on the grid side.
-  - We have three equations, AVE is working on verifying that they are correct 14/8-25.
-  - [ ] Find out a way to verify the three functions, maybe speak with Nenad?
-- [ ] Write function in toolbox.py to output all impedances in system **Tools.get_impedances()**
-- [ ] Implement solver (somewhat implemented, verify if it works)
+- [x] Derive three equations on the grid side.
+  - We have three equations, AVE is working on verifying that they are correct 14/8-25. **Update**: I took the number out of the solver and plugged it into the equations, it looks like the power from the turbines are all active power, and the voltages also makes sense, so I think we're good. 
+  - [x] Find out a way to verify the three functions, maybe speak with Nenad?
+- [x] Write function in toolbox.py to output all impedances in system **Tools.get_impedances()**
+  - AVE: I used a mix of my own and Ivans code, they produce equivalent values now.
+- [x] Implement solver (somewhat implemented, verify if it works)
 - [ ] Put the whole dang thing into a for loop to compute over range of wind speeds.
 - [ ] Also, write a report
 
